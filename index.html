@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="₹→¥" />
+  <meta name="theme-color" content="#0d0d0d" />
+  <title>₹ → ¥</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400&family=Sora:wght@300;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100%;
+      background: #0d0d0d;
+      color: #f0ede6;
+      font-family: 'DM Mono', 'Courier New', monospace;
+      -webkit-font-smoothing: antialiased;
+      overscroll-behavior: none;
+    }
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
+    input[type=number] { -moz-appearance: textfield; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100svh;
+      padding: 24px 20px 48px;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 36px;
+      animation: fadeUp .45s ease both;
+    }
+    .header-label {
+      font-family: 'Sora', sans-serif;
+      font-size: 10px;
+      letter-spacing: .3em;
+      color: #ff6b2b;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .header-title {
+      font-family: 'Sora', sans-serif;
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -.02em;
+    }
+    .card {
+      width: 100%;
+      max-width: 390px;
+      background: #181818;
+      border: 1px solid #252525;
+      border-radius: 22px;
+      padding: 26px 22px;
+      animation: fadeUp .45s .08s ease both;
+      opacity: 0;
+    }
+    .field-label {
+      font-size: 10px;
+      letter-spacing: .22em;
+      color: #555;
+      text-transform: uppercase;
+      margin-bottom: 9px;
+    }
+    .input-row {
+      display: flex;
+      align-items: center;
+      background: #111;
+      border: 1.5px solid #2e2e2e;
+      border-radius: 14px;
+      padding: 16px 16px;
+      transition: border-color .15s;
+    }
+    .input-row:focus-within { border-color: #ff6b2b66; }
+    .sym {
+      font-family: 'Sora', sans-serif;
+      font-size: 28px;
+      font-weight: 300;
+      line-height: 1;
+      margin-right: 10px;
+      flex-shrink: 0;
+    }
+    .sym-inr { color: #ff6b2b; }
+    .sym-jpy { color: #4ade80; }
+    #inr-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      font-family: 'DM Mono', monospace;
+      font-size: 32px;
+      color: #f0ede6;
+      min-width: 0;
+    }
+    #inr-input::placeholder { color: #2a2a2a; }
+    .clear-btn {
+      background: none;
+      border: none;
+      color: #444;
+      cursor: pointer;
+      font-size: 24px;
+      padding: 4px 6px;
+      line-height: 1;
+      flex-shrink: 0;
+      display: none;
+    }
+    .arrow {
+      text-align: center;
+      padding: 12px 0;
+      color: #2a2a2a;
+      font-size: 18px;
+    }
+    .result-row {
+      display: flex;
+      align-items: center;
+      background: #111;
+      border: 1.5px solid #2a2a2a;
+      border-radius: 14px;
+      padding: 16px 16px;
+      min-height: 66px;
+      transition: border-color .25s, background .25s;
+    }
+    .result-row.active {
+      background: #0c180c;
+      border-color: #1d4d1d;
+    }
+    #jpy-result {
+      font-family: 'DM Mono', monospace;
+      font-size: 32px;
+      color: #2a2a2a;
+      transition: color .2s;
+    }
+    .result-row.active #jpy-result { color: #f0ede6; }
+    .quick-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 16px;
+    }
+    .quick-btn {
+      flex: 1;
+      background: #111;
+      border: 1px solid #2a2a2a;
+      border-radius: 10px;
+      padding: 12px 4px;
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      color: #666;
+      cursor: pointer;
+      text-align: center;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .quick-btn:active {
+      border-color: #ff6b2b66;
+      color: #ff6b2b;
+    }
+    .rate-info {
+      margin-top: 14px;
+      font-size: 11px;
+      color: #3a3a3a;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 6px;
+    }
+    .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .dot-live { background: #4ade80; animation: pulse 2s infinite; }
+    .dot-loading {
+      width: 10px; height: 10px;
+      border: 1.5px solid #333;
+      border-top-color: #ff6b2b;
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+    }
+    .dot-fallback { background: #f59e0b; }
+    .hint {
+      margin-top: 20px;
+      font-size: 11px;
+      color: #282828;
+      animation: fadeUp .45s .22s ease both;
+      opacity: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="header-label">India → Japan</div>
+    <div class="header-title">₹ → ¥</div>
+  </div>
+  <div class="card">
+    <div class="field-label">インドルピー</div>
+    <div class="input-row">
+      <span class="sym sym-inr">₹</span>
+      <input id="inr-input" type="number" inputmode="decimal" placeholder="0" autocomplete="off" />
+      <button class="clear-btn" id="clear-btn">×</button>
+    </div>
+    <div class="quick-row">
+      <button class="quick-btn" data-v="100">₹100</button>
+      <button class="quick-btn" data-v="500">₹500</button>
+      <button class="quick-btn" data-v="1000">₹1K</button>
+      <button class="quick-btn" data-v="5000">₹5K</button>
+      <button class="quick-btn" data-v="10000">₹1万</button>
+    </div>
+    <div class="arrow">↓</div>
+    <div class="field-label">日本円</div>
+    <div class="result-row" id="result-row">
+      <span class="sym sym-jpy">¥</span>
+      <span id="jpy-result">—</span>
+    </div>
+    <div class="rate-info">
+      <span id="rate-dot" class="dot dot-loading"></span>
+      <span id="rate-text">レート取得中...</span>
+    </div>
+  </div>
+  <div class="hint">× でクリア</div>
+<script>
+(function () {
+  const FALLBACK_RATE = 1.695;
+  const CACHE_KEY = 'inrjpy_rate_cache';
+  let rate = FALLBACK_RATE;
+
+  const inrInput  = document.getElementById('inr-input');
+  const jpyResult = document.getElementById('jpy-result');
+  const resultRow = document.getElementById('result-row');
+  const clearBtn  = document.getElementById('clear-btn');
+  const rateDot   = document.getElementById('rate-dot');
+  const rateText  = document.getElementById('rate-text');
+
+  async function getRate() {
+    try {
+      const cached = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
+      if (cached && (Date.now() - cached.ts) < 24 * 60 * 60 * 1000) {
+        return { rate: cached.rate, fresh: false };
+      }
+      const res = await fetch('https://api.exchangerate-api.com/v4/latest/INR');
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      const r = data.rates?.JPY;
+      if (!r) throw new Error();
+      localStorage.setItem(CACHE_KEY, JSON.stringify({ rate: r, ts: Date.now() }));
+      return { rate: r, fresh: true };
+    } catch {
+      try {
+        const res2 = await fetch('https://open.er-api.com/v6/latest/INR');
+        const data2 = await res2.json();
+        const r2 = data2.rates?.JPY;
+        if (!r2) throw new Error();
+        localStorage.setItem(CACHE_KEY, JSON.stringify({ rate: r2, ts: Date.now() }));
+        return { rate: r2, fresh: true };
+      } catch {
+        return { rate: FALLBACK_RATE, fresh: null };
+      }
+    }
+  }
+
+  getRate().then(({ rate: r, fresh }) => {
+    rate = r;
+    if (fresh === true) {
+      rateDot.className = 'dot dot-live';
+      rateText.textContent = '1 ₹ = ¥' + rate.toFixed(3) + '（本日レート）';
+    } else if (fresh === false) {
+      rateDot.className = 'dot dot-live';
+      rateText.textContent = '1 ₹ = ¥' + rate.toFixed(3) + '（本日レート）';
+    } else {
+      rateDot.className = 'dot dot-fallback';
+      rateText.textContent = '1 ₹ = ¥' + rate.toFixed(3) + '（参考値）';
+    }
+    recalc();
+  });
+
+  function recalc() {
+    const v = parseFloat(inrInput.value);
+    if (!isNaN(v) && v >= 0 && inrInput.value !== '') {
+      const jpy = Math.round(v * rate);
+      jpyResult.textContent = jpy.toLocaleString('ja-JP');
+      resultRow.classList.add('active');
+      clearBtn.style.display = 'inline';
+    } else {
+      jpyResult.textContent = '—';
+      resultRow.classList.remove('active');
+      clearBtn.style.display = 'none';
+    }
+  }
+
+  inrInput.addEventListener('input', recalc);
+  inrInput.addEventListener('keydown', e => { if (e.key === 'Escape') clear(); });
+  clearBtn.addEventListener('click', clear);
+
+  function clear() {
+    inrInput.value = '';
+    recalc();
+    inrInput.focus();
+  }
+
+  document.getElementById('quick-row') && document.querySelectorAll('.quick-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      inrInput.value = btn.dataset.v;
+      recalc();
+    });
+  });
+
+  window.addEventListener('load', () => inrInput.focus());
+})();
+</script>
+</body>
+</html>
