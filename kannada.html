@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="カンナダ語" />
+  <meta name="theme-color" content="#12050a" />
+  <title>カンナダ語 学習</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #12050a;
+      --card-bg: #1e0c12;
+      --card-border: #3d1a22;
+      --gold: #c9a227;
+      --gold-light: #e8c547;
+      --text: #f0e6c8;
+      --text-muted: #9a8868;
+      --green: #1e5c38;
+      --green-hover: #26704a;
+      --red: #5a1520;
+      --red-hover: #731c28;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', 'Yu Gothic', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overscroll-behavior: none;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100svh;
+      padding: max(env(safe-area-inset-top), 14px) 16px max(env(safe-area-inset-bottom), 20px);
+    }
+
+    /* ── Header ── */
+    .header {
+      text-align: center;
+      margin-bottom: 12px;
+    }
+    .header h1 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: 0.1em;
+    }
+    .header .subtitle {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+
+    /* ── Progress ── */
+    .progress-wrap { margin-bottom: 14px; }
+    .progress-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.67rem;
+      color: var(--text-muted);
+      margin-bottom: 5px;
+    }
+    .progress-bar {
+      width: 100%;
+      height: 4px;
+      background: var(--card-border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--gold);
+      border-radius: 2px;
+      transition: width 0.5s ease;
+    }
+
+    /* ── Tabs ── */
+    .tabs {
+      display: flex;
+      gap: 7px;
+      overflow-x: auto;
+      padding-bottom: 10px;
+      margin-bottom: 12px;
+      scrollbar-width: none;
+    }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab {
+      flex-shrink: 0;
+      padding: 5px 13px;
+      border-radius: 20px;
+      border: 1px solid var(--card-border);
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 0.72rem;
+      font-family: inherit;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+    .tab.active {
+      background: var(--gold);
+      border-color: var(--gold);
+      color: #12050a;
+      font-weight: 700;
+    }
+
+    /* ── Card area ── */
+    .card-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+    }
+
+    /* ── Card flip ── */
+    .card-scene {
+      width: 100%;
+      max-width: 440px;
+      perspective: 1000px;
+      cursor: pointer;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .card-flip {
+      position: relative;
+      width: 100%;
+      transform-style: preserve-3d;
+      transition: transform 0.42s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .card-flip.flipped { transform: rotateY(180deg); }
+
+    .card-face {
+      width: 100%;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 32px 22px 26px;
+      min-height: 230px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+    .card-back {
+      position: absolute;
+      top: 0; left: 0;
+      transform: rotateY(180deg);
+    }
+
+    /* Front */
+    .card-cat {
+      font-size: 0.63rem;
+      color: var(--gold);
+      letter-spacing: 0.12em;
+      margin-bottom: 14px;
+    }
+    .card-ja {
+      font-size: 1.55rem;
+      font-weight: 700;
+      text-align: center;
+      line-height: 1.45;
+    }
+    .card-tap-hint {
+      font-size: 0.62rem;
+      color: var(--text-muted);
+      margin-top: 18px;
+    }
+
+    /* Back */
+    .card-kata {
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: var(--gold-light);
+      text-align: center;
+      margin-bottom: 12px;
+      letter-spacing: 0.04em;
+      line-height: 1.4;
+    }
+    .card-kn {
+      font-size: 1.35rem;
+      text-align: center;
+      margin-bottom: 14px;
+      line-height: 1.6;
+    }
+    .card-gr-label {
+      font-size: 0.58rem;
+      color: var(--gold);
+      letter-spacing: 0.1em;
+      margin-bottom: 4px;
+    }
+    .card-gr {
+      font-size: 0.68rem;
+      color: #c8b898;
+      text-align: center;
+      padding: 6px 14px;
+      background: rgba(201, 162, 39, 0.08);
+      border: 1px solid rgba(201, 162, 39, 0.15);
+      border-radius: 8px;
+      line-height: 1.7;
+      max-width: 100%;
+    }
+    .score-dots {
+      display: flex;
+      gap: 6px;
+      margin-top: 16px;
+    }
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      border: 1px solid var(--card-border);
+      background: transparent;
+    }
+    .dot.filled { background: var(--gold); border-color: var(--gold); }
+
+    /* ── Buttons ── */
+    .card-count {
+      font-size: 0.63rem;
+      color: var(--text-muted);
+      margin-top: 14px;
+      margin-bottom: 4px;
+      min-height: 1em;
+    }
+    .buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 14px;
+      width: 100%;
+      max-width: 440px;
+    }
+    .btn {
+      flex: 1;
+      padding: 15px 10px;
+      border: none;
+      border-radius: 12px;
+      font-size: 0.92rem;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      transition: opacity 0.12s, transform 0.1s, background 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn:active { transform: scale(0.96); opacity: 0.85; }
+    .btn-again { background: var(--red); color: var(--text); }
+    .btn-again:hover { background: var(--red-hover); }
+    .btn-got { background: var(--green); color: #e8f5ed; }
+    .btn-got:hover { background: var(--green-hover); }
+    .btn:disabled { opacity: 0.25; cursor: default; }
+
+    /* ── Reset ── */
+    .reset-wrap {
+      text-align: center;
+      margin-top: 18px;
+    }
+    .reset-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.62rem;
+      font-family: inherit;
+      cursor: pointer;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      padding: 4px;
+    }
+    .reset-btn:hover { color: var(--text); }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>ಕನ್ನಡ 学習</h1>
+    <div class="subtitle">コアフレーズ 30 — カタカナ読み付き</div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-info">
+      <span>定着済み（スコア3以上）</span>
+      <span id="progress-text">0 / 30</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+    </div>
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+
+  <div class="card-area">
+    <div class="card-scene" id="card-scene" onclick="flipCard()">
+      <div class="card-flip" id="card-flip">
+        <div class="card-face" id="card-front">
+          <div class="card-cat" id="card-cat"></div>
+          <div class="card-ja" id="card-ja"></div>
+          <div class="card-tap-hint">タップして読み方を見る</div>
+        </div>
+        <div class="card-face card-back" id="card-back">
+          <div class="card-kata" id="card-kata"></div>
+          <div class="card-kn" id="card-kn"></div>
+          <div class="card-gr-label">文 法</div>
+          <div class="card-gr" id="card-gr"></div>
+          <div class="score-dots" id="score-dots"></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-count" id="card-count"></div>
+    <div class="buttons" id="buttons">
+      <button class="btn btn-again" onclick="rate(false)">もう一度 ↩</button>
+      <button class="btn btn-got" onclick="rate(true)">覚えた ✓</button>
+    </div>
+    <div class="reset-wrap">
+      <button class="reset-btn" onclick="resetProgress()">進捗をリセット</button>
+    </div>
+  </div>
+
+  <script>
+    const PHRASES = [
+      // 挨拶
+      { id:1,  cat:'挨拶',      ja:'こんにちは',             kata:'ナマスカーラ',                    kn:'ನಮಸ್ಕಾರ',               gr:'汎用挨拶（朝昼夜いつでも使える）' },
+      { id:2,  cat:'挨拶',      ja:'おはようございます',      kata:'シュボーダヤ',                    kn:'ಶುಭೋದಯ',               gr:'朝の挨拶（フォーマル）' },
+      { id:3,  cat:'挨拶',      ja:'こんばんは',              kata:'シュバ サンジェ',                 kn:'ಶುಭ ಸಂಜೆ',             gr:'夕方〜夜の挨拶' },
+      { id:4,  cat:'挨拶',      ja:'お元気ですか？',          kata:'ヘーゲ イッディーラ？',           kn:'ಹೇಗೆ ಇದ್ದೀರಾ?',        gr:'疑問文（丁寧体）動詞ಇರु（いる）の活用' },
+      { id:5,  cat:'挨拶',      ja:'元気です',                kata:'チェンナーギ イッィーニ',         kn:'ಚೆನ್ನಾಗಿ ಇದ್ದೀನಿ',     gr:'副詞「よく」+ 動詞ಇರu一人称現在形' },
+      { id:6,  cat:'挨拶',      ja:'さようなら / またね',     kata:'マッテ スィゴーナ',               kn:'ಮತ್ತೆ ಸಿಗೋಣ',          gr:'直訳「また会おう」（勧誘形）' },
+
+      // お礼・お詫び
+      { id:7,  cat:'お礼・お詫び', ja:'ありがとうございます', kata:'ダンニャワーダガル',              kn:'ಧನ್ಯವಾದಗಳು',           gr:'名詞の複数形（複数形にすると丁寧）' },
+      { id:8,  cat:'お礼・お詫び', ja:'どういたしまして',     kata:'パラワー イッラ',                 kn:'ಪರವಾ ಇಲ್ಲ',            gr:'直訳「構いません」' },
+      { id:9,  cat:'お礼・お詫び', ja:'すみません（呼びかけ）',kata:'クシャミスィ',                   kn:'ಕ್ಷಮಿಸಿ',              gr:'動詞「許す」の命令形（丁寧）' },
+      { id:10, cat:'お礼・お詫び', ja:'ごめんなさい',         kata:'ダヤヴィッス クシャミスィ',       kn:'ದಯವಿಟ್ಟು ಕ್ಷಮಿಸಿ',    gr:'副詞「どうか」+ 動詞（より丁寧なお詫び）' },
+
+      // はい・いいえ
+      { id:11, cat:'はい・いいえ', ja:'はい',                 kata:'ハウドゥ',                        kn:'ಹೌದು',                 gr:'肯定の応答詞' },
+      { id:12, cat:'はい・いいえ', ja:'いいえ / ない',        kata:'イッラ',                          kn:'ಇಲ್ಲ',                 gr:'否定詞（存在否定にも使う）' },
+      { id:13, cat:'はい・いいえ', ja:'わかりました / OK',    kata:'サリ',                            kn:'ಸರಿ',                  gr:'形容詞「正しい」→ 同意・了承の返事' },
+      { id:14, cat:'はい・いいえ', ja:'わかりません',         kata:'ゴッティッラ',                    kn:'ಗೊತ್ತಿಲ್ಲ',           gr:'動詞「知っている」の否定形' },
+
+      // 依頼
+      { id:15, cat:'依頼', ja:'ちょっと待ってください',       kata:'スワルパ ニッリ',                  kn:'ಸ್ವಲ್ಪ ನಿಲ್ಲಿ',        gr:'副詞「少し」+ 動詞「止まる」命令形' },
+      { id:16, cat:'依頼', ja:'もう一度言ってください',       kata:'マッテ ヘーリ',                    kn:'ಮತ್ತೆ ಹೇಳಿ',           gr:'副詞「また」+ 動詞「言う」命令形' },
+      { id:17, cat:'依頼', ja:'ゆっくり話してください',       kata:'スワルパ ニダーナヴァーギ マータディ', kn:'ಸ್ವಲ್ಪ ನಿಧಾನವಾಗಿ ಮಾತಾಡಿ', gr:'副詞「少し」+「ゆっくり」+ 動詞「話す」命令形' },
+      { id:18, cat:'依頼', ja:'カンナダ語がわかりません',     kata:'ナナゲ カンナダ バラッラ',          kn:'ನನಗೆ ಕನ್ನಡ ಬರಲ್ಲ',    gr:'与格「私には」+ 言語名 + 動詞「できない」' },
+      { id:19, cat:'依頼', ja:'英語は話せますか？',           kata:'ニーヴ イングリーシュ ゴッターア？', kn:'ನೀವು ಇಂಗ್ಲಿಷ್ ಗೊತ್ತಾ?', gr:'二人称（丁寧）+ 名詞 + 疑問助詞-ಆ' },
+
+      // 日常会話
+      { id:20, cat:'日常会話', ja:'私の名前は〇〇です',       kata:'ナンナ ヘサル 〇〇',              kn:'ನನ್ನ ಹೆಸರು ___',       gr:'所有代名詞「私の」+ 名詞「名前」（be動詞省略）' },
+      { id:21, cat:'日常会話', ja:'日本から来ました',         kata:'ジャパン ニンダ バンデー',         kn:'ಜಪಾನ್‌ನಿಂದ ಬಂದೆ',     gr:'地名 + 奪格助詞-ನಿಂದ + 動詞「来た」一人称' },
+      { id:22, cat:'日常会話', ja:'これはいくらですか？',     kata:'イダル ベレ エシュトゥ？',         kn:'ಇದರ ಬೆಲೆ ಎಷ್ಟು?',     gr:'指示代名詞（属格）+ 名詞「値段」+ 疑問詞' },
+      { id:23, cat:'日常会話', ja:'おいしい！',               kata:'バハラ チェンナーギデ！',          kn:'ಬಹಳ ಚೆನ್ನಾಗಿದೆ!',     gr:'副詞「とても」+ 形容詞（三人称・丁寧体）' },
+      { id:24, cat:'日常会話', ja:'トイレはどこですか？',     kata:'レストルーム エッリデ？',          kn:'ರೆಸ್ಟ್‌ರೂಂ ಎಲ್ಲಿದೆ?', gr:'名詞 + 疑問詞「どこにある?」' },
+      { id:25, cat:'日常会話', ja:'ちょっと高い',             kata:'スワルパ ジャースティ アーイトゥ', kn:'ಸ್ವಲ್ಪ ಜಾಸ್ತಿ ಆಯ್ತು', gr:'副詞「少し」+「多い→高い」+ 動詞（なってしまった）' },
+
+      // 数字
+      { id:26, cat:'数字', ja:'1',  kata:'オンドゥ',  kn:'ಒಂದು',  gr:'基数詞' },
+      { id:27, cat:'数字', ja:'2',  kata:'エラドゥ',  kn:'ಎರಡು',  gr:'基数詞' },
+      { id:28, cat:'数字', ja:'3',  kata:'ムール',    kn:'ಮೂರು',  gr:'基数詞' },
+      { id:29, cat:'数字', ja:'5',  kata:'アイドゥ',  kn:'ಐದು',   gr:'基数詞' },
+      { id:30, cat:'数字', ja:'10', kata:'ハットゥ',  kn:'ಹತ್ತು', gr:'基数詞' },
+    ];
+
+    const CATS = ['すべて', ...new Set(PHRASES.map(p => p.cat))];
+    let scores = {};
+    let currentCat = 'すべて';
+    let currentPhrase = null;
+    let isFlipped = false;
+
+    function loadScores() {
+      try {
+        const s = localStorage.getItem('kannada-scores');
+        scores = s ? JSON.parse(s) : {};
+      } catch(e) { scores = {}; }
+    }
+
+    function saveScores() {
+      try { localStorage.setItem('kannada-scores', JSON.stringify(scores)); } catch(e) {}
+    }
+
+    function getScore(id) { return scores[id] || 0; }
+
+    function getFilteredPhrases() {
+      if (currentCat === 'すべて') return PHRASES;
+      return PHRASES.filter(p => p.cat === currentCat);
+    }
+
+    // 重み付き抽選: スコアが低いほど出やすい
+    function pickPhrase() {
+      const pool = getFilteredPhrases();
+      if (!pool.length) return null;
+      const weights = pool.map(p => Math.max(1, 6 - getScore(p.id)));
+      const total = weights.reduce((a, b) => a + b, 0);
+      let r = Math.random() * total;
+      for (let i = 0; i < pool.length; i++) {
+        r -= weights[i];
+        if (r <= 0) return pool[i];
+      }
+      return pool[pool.length - 1];
+    }
+
+    function renderTabs() {
+      document.getElementById('tabs').innerHTML = CATS.map(cat =>
+        `<button class="tab${cat === currentCat ? ' active' : ''}" onclick="selectCat('${cat}')">${cat}</button>`
+      ).join('');
+    }
+
+    function selectCat(cat) {
+      currentCat = cat;
+      renderTabs();
+      nextCard();
+    }
+
+    function updateProgress() {
+      const done = PHRASES.filter(p => getScore(p.id) >= 3).length;
+      const total = PHRASES.length;
+      document.getElementById('progress-text').textContent = `${done} / ${total}`;
+      document.getElementById('progress-fill').style.width = `${(done / total * 100).toFixed(0)}%`;
+    }
+
+    function renderCard(phrase) {
+      if (!phrase) return;
+      document.getElementById('card-cat').textContent = phrase.cat;
+      document.getElementById('card-ja').textContent = phrase.ja;
+      document.getElementById('card-kata').textContent = phrase.kata;
+      document.getElementById('card-kn').textContent = phrase.kn;
+      document.getElementById('card-gr').textContent = phrase.gr;
+
+      const score = getScore(phrase.id);
+      document.getElementById('score-dots').innerHTML =
+        Array.from({length: 5}, (_, i) =>
+          `<div class="dot${i < score ? ' filled' : ''}"></div>`
+        ).join('');
+
+      const pool = getFilteredPhrases();
+      const catDone = pool.filter(p => getScore(p.id) >= 3).length;
+      document.getElementById('card-count').textContent =
+        `このカテゴリ: ${catDone} / ${pool.length} 定着`;
+    }
+
+    function flipCard() {
+      isFlipped = !isFlipped;
+      document.getElementById('card-flip').classList.toggle('flipped', isFlipped);
+    }
+
+    function nextCard() {
+      isFlipped = false;
+      document.getElementById('card-flip').classList.remove('flipped');
+      currentPhrase = pickPhrase();
+      renderCard(currentPhrase);
+      updateProgress();
+    }
+
+    function rate(got) {
+      if (!currentPhrase) return;
+      const id = currentPhrase.id;
+      scores[id] = got
+        ? Math.min(5, getScore(id) + 1)
+        : Math.max(0, getScore(id) - 1);
+      saveScores();
+      nextCard();
+    }
+
+    function resetProgress() {
+      if (!confirm('進捗をすべてリセットしますか？')) return;
+      scores = {};
+      saveScores();
+      nextCard();
+    }
+
+    // 起動
+    loadScores();
+    renderTabs();
+    nextCard();
+  </script>
+</body>
+</html>
