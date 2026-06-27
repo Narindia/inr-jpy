@@ -45,6 +45,37 @@
       padding-right: 20px;
       padding-bottom: max(env(safe-area-inset-bottom), 16px);
     }
+
+    /* ── Tab bar ── */
+    .tab-bar {
+      display: flex;
+      gap: 4px;
+      width: 100%;
+      max-width: 390px;
+      background: #181818;
+      border: 1px solid #252525;
+      border-radius: 14px;
+      padding: 4px;
+      margin-bottom: 12px;
+      animation: fadeUp .3s ease both;
+    }
+    .tab {
+      flex: 1;
+      background: none;
+      border: none;
+      border-radius: 10px;
+      padding: 9px;
+      font-family: 'Sora', sans-serif;
+      font-size: 13px;
+      font-weight: 300;
+      color: #444;
+      cursor: pointer;
+      transition: background .15s, color .15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .tab.active { background: #ff6b2b1a; color: #ff6b2b; }
+
+    /* ── Header ── */
     .header {
       text-align: center;
       margin-bottom: 12px;
@@ -58,6 +89,8 @@
       color: #ff6b2b;
       text-transform: uppercase;
     }
+
+    /* ── Card ── */
     .card {
       width: 100%;
       max-width: 390px;
@@ -200,6 +233,144 @@
       animation: spin .8s linear infinite;
     }
     .dot-fallback { background: #f59e0b; }
+
+    /* ── Warikan ── */
+    .w-section-hd {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 14px;
+      margin-bottom: 8px;
+    }
+    .add-person-btn {
+      background: none;
+      border: 1px solid #2a2a2a;
+      border-radius: 8px;
+      color: #ff6b2b;
+      font-size: 12px;
+      font-family: 'DM Mono', monospace;
+      padding: 4px 10px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: border-color .15s;
+    }
+    .add-person-btn:active { border-color: #ff6b2b44; }
+    .person-row {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 7px;
+    }
+    .person-name-inp {
+      flex: 1;
+      background: #111;
+      border: 1.5px solid #2a2a2a;
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      color: #f0ede6;
+      outline: none;
+      min-width: 0;
+      transition: border-color .15s;
+    }
+    .person-name-inp:focus { border-color: #ff6b2b44; }
+    .person-name-inp::placeholder { color: #333; }
+    .shares-ctrl {
+      display: flex;
+      align-items: center;
+      background: #111;
+      border: 1.5px solid #2a2a2a;
+      border-radius: 10px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .sh-btn {
+      background: none;
+      border: none;
+      color: #ff6b2b;
+      font-size: 16px;
+      width: 30px;
+      height: 36px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .sh-btn:active { background: #1a1a1a; }
+    .sh-val {
+      font-family: 'DM Mono', monospace;
+      font-size: 14px;
+      color: #f0ede6;
+      width: 24px;
+      text-align: center;
+    }
+    .rm-btn {
+      background: none;
+      border: none;
+      color: #333;
+      font-size: 18px;
+      cursor: pointer;
+      padding: 0 2px;
+      flex-shrink: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .rm-btn:active { color: #666; }
+    .w-result {
+      margin-top: 12px;
+      background: #0c180c;
+      border: 1.5px solid #1d4d1d;
+      border-radius: 14px;
+      padding: 12px 14px;
+      display: none;
+    }
+    .w-unit {
+      font-size: 10px;
+      letter-spacing: .15em;
+      color: #4ade8077;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .w-divider { border-top: 1px solid #1a3d1a; margin: 8px 0; }
+    .w-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 2px 0;
+    }
+    .w-person { font-size: 13px; color: #888; }
+    .w-shares { font-size: 10px; color: #444; margin-left: 5px; }
+    .w-amt {
+      font-family: 'DM Mono', monospace;
+      font-size: 15px;
+      color: #4ade80;
+    }
+    .w-total-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 2px 0;
+    }
+    .w-total-label { font-size: 11px; color: #444; letter-spacing: .1em; }
+    .w-total-amt {
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      color: #444;
+    }
+    .total-inp {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      font-family: 'DM Mono', monospace;
+      font-size: 28px;
+      color: #f0ede6;
+      min-width: 0;
+    }
+    .total-inp::placeholder { color: #2a2a2a; }
+
+    /* ── Flags ── */
     .flags {
       margin-top: 40px;
       display: flex;
@@ -212,10 +383,16 @@
   </style>
 </head>
 <body>
-  <div class="header">
+  <div class="tab-bar">
+    <button class="tab active" data-tab="converter">換算</button>
+    <button class="tab" data-tab="warikan">割り勘</button>
+  </div>
+
+  <!-- Converter -->
+  <div class="header" id="header-wrap">
     <div class="header-label" id="header-label">India → Japan</div>
   </div>
-  <div class="card">
+  <div class="card" id="tab-converter">
     <div class="field-label" id="from-label">インドルピー</div>
     <div class="input-row">
       <span class="sym sym-from" id="from-sym">₹</span>
@@ -241,13 +418,34 @@
       <span id="rate-text">レート取得中...</span>
     </div>
   </div>
+
+  <!-- Warikan -->
+  <div class="card" id="tab-warikan" style="display:none">
+    <div class="field-label">合計金額</div>
+    <div class="input-row">
+      <span class="sym sym-from">₹</span>
+      <input class="total-inp" id="total-inp" type="number" inputmode="decimal" placeholder="0" autocomplete="off" />
+      <button class="clear-btn" id="total-clear">×</button>
+    </div>
+    <div class="w-section-hd">
+      <div class="field-label" style="margin:0">メンバー</div>
+      <button class="add-person-btn" id="add-person-btn">＋ 追加</button>
+    </div>
+    <div id="people-list"></div>
+    <div class="w-result" id="w-result"></div>
+  </div>
+
   <div class="flags">
     <span>🇮🇳</span>
     <span class="flags-arrow">↔</span>
     <span>🇯🇵</span>
   </div>
+
 <script>
 (function () {
+  'use strict';
+
+  // ── Converter ─────────────────────────────────────────────────────────────
   const FALLBACK_RATE = 1.695;
   const CACHE_KEY = 'inrjpy_rate_v2';
   let rate = FALLBACK_RATE;
@@ -298,21 +496,16 @@
   }
 
   function updateRateDisplay(fresh) {
-    const d = dateStr();
     if (fresh === null) {
       rateDot.className = 'dot dot-fallback';
       rateText.textContent = `1 ₹ = ¥${rate.toFixed(3)}（参考値）`;
     } else {
       rateDot.className = 'dot dot-live';
-      rateText.textContent = `1 ₹ = ¥${rate.toFixed(3)}（${d}）`;
+      rateText.textContent = `1 ₹ = ¥${rate.toFixed(3)}（${dateStr()}）`;
     }
   }
 
-  getRate().then(({ rate: r, fresh }) => {
-    rate = r;
-    updateRateDisplay(fresh);
-    recalc();
-  });
+  getRate().then(({ rate: r, fresh }) => { rate = r; updateRateDisplay(fresh); recalc(); });
 
   const QUICK_INR = [100, 500, 1000, 5000, 10000];
   const QUICK_JPY = [500, 1000, 5000, 10000, 50000];
@@ -349,14 +542,9 @@
   }
 
   fromInput.addEventListener('input', recalc);
-  fromInput.addEventListener('keydown', e => { if (e.key === 'Escape') clear(); });
-  clearBtn.addEventListener('click', clear);
-
-  function clear() {
-    fromInput.value = '';
-    recalc();
-    fromInput.focus();
-  }
+  fromInput.addEventListener('keydown', e => { if (e.key === 'Escape') clearConv(); });
+  clearBtn.addEventListener('click', clearConv);
+  function clearConv() { fromInput.value = ''; recalc(); fromInput.focus(); }
 
   toggleBtn.addEventListener('click', () => {
     mode = mode === 'INR_TO_JPY' ? 'JPY_TO_INR' : 'INR_TO_JPY';
@@ -371,6 +559,166 @@
     fromInput.value = btn.dataset.v;
     recalc();
   });
+
+  // ── Tab switching ──────────────────────────────────────────────────────────
+  const tabConverter = document.getElementById('tab-converter');
+  const tabWarikan   = document.getElementById('tab-warikan');
+  const headerWrap   = document.getElementById('header-wrap');
+
+  document.querySelector('.tab-bar').addEventListener('click', e => {
+    const tab = e.target.closest('.tab');
+    if (!tab) return;
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    const isConv = tab.dataset.tab === 'converter';
+    tabConverter.style.display = isConv ? '' : 'none';
+    headerWrap.style.display   = isConv ? '' : 'none';
+    tabWarikan.style.display   = isConv ? 'none' : '';
+    setTimeout(() => (isConv ? fromInput : totalInp).focus(), 50);
+  });
+
+  // ── Warikan ───────────────────────────────────────────────────────────────
+  const totalInp   = document.getElementById('total-inp');
+  const totalClear = document.getElementById('total-clear');
+  const peopleList = document.getElementById('people-list');
+  const addBtn     = document.getElementById('add-person-btn');
+  const wResult    = document.getElementById('w-result');
+
+  // Default: 3人、傾斜あり（2口/1口/1口）
+  let people = [
+    { name: '', shares: 2 },
+    { name: '', shares: 1 },
+    { name: '', shares: 1 },
+  ];
+
+  function renderPeople() {
+    peopleList.innerHTML = '';
+    people.forEach((p, i) => {
+      const row = document.createElement('div');
+      row.className = 'person-row';
+
+      const nameInp = document.createElement('input');
+      nameInp.className = 'person-name-inp';
+      nameInp.type = 'text';
+      nameInp.placeholder = `${i + 1}人目`;
+      nameInp.value = p.name;
+      nameInp.maxLength = 10;
+      nameInp.addEventListener('input', () => { people[i].name = nameInp.value; calcWarikan(); });
+
+      const ctrl = document.createElement('div');
+      ctrl.className = 'shares-ctrl';
+
+      const dec = document.createElement('button');
+      dec.className = 'sh-btn';
+      dec.textContent = '−';
+      dec.addEventListener('click', () => {
+        if (people[i].shares > 1) { people[i].shares--; renderPeople(); calcWarikan(); }
+      });
+
+      const val = document.createElement('span');
+      val.className = 'sh-val';
+      val.textContent = p.shares;
+
+      const inc = document.createElement('button');
+      inc.className = 'sh-btn';
+      inc.textContent = '+';
+      inc.addEventListener('click', () => {
+        if (people[i].shares < 9) { people[i].shares++; renderPeople(); calcWarikan(); }
+      });
+
+      ctrl.append(dec, val, inc);
+
+      const rm = document.createElement('button');
+      rm.className = 'rm-btn';
+      rm.textContent = '×';
+      rm.addEventListener('click', () => {
+        if (people.length > 1) { people.splice(i, 1); renderPeople(); calcWarikan(); }
+      });
+
+      row.append(nameInp, ctrl, rm);
+      peopleList.appendChild(row);
+    });
+  }
+
+  function calcWarikan() {
+    totalClear.style.display = totalInp.value ? 'inline' : 'none';
+
+    const raw = parseFloat(totalInp.value);
+    if (!totalInp.value || isNaN(raw) || raw <= 0) {
+      wResult.style.display = 'none';
+      return;
+    }
+
+    const total = Math.round(raw);
+    const totalShares = people.reduce((s, p) => s + p.shares, 0);
+    const unitPrice = total / totalShares;
+
+    // Floor each person's amount, give remainder to the highest-share person
+    const amounts = people.map(p => Math.floor(p.shares * unitPrice));
+    const remainder = total - amounts.reduce((s, a) => s + a, 0);
+    const maxIdx = people.reduce((mi, p, i) => p.shares > people[mi].shares ? i : mi, 0);
+    amounts[maxIdx] += remainder;
+
+    wResult.innerHTML = '';
+    wResult.style.display = 'block';
+
+    const unitDiv = document.createElement('div');
+    unitDiv.className = 'w-unit';
+    unitDiv.textContent = `1口 ₹${Math.round(unitPrice).toLocaleString('ja-JP')}`;
+    wResult.appendChild(unitDiv);
+
+    const mkDiv = cls => Object.assign(document.createElement('div'), { className: cls });
+
+    wResult.appendChild(mkDiv('w-divider'));
+
+    people.forEach((p, i) => {
+      const row = mkDiv('w-row');
+
+      const left = document.createElement('span');
+      const nameEl = document.createElement('span');
+      nameEl.className = 'w-person';
+      nameEl.textContent = p.name || `${i + 1}人目`;
+      const sharesEl = document.createElement('span');
+      sharesEl.className = 'w-shares';
+      sharesEl.textContent = `${p.shares}口`;
+      left.append(nameEl, sharesEl);
+
+      const amt = document.createElement('span');
+      amt.className = 'w-amt';
+      amt.textContent = `₹${amounts[i].toLocaleString('ja-JP')}`;
+
+      row.append(left, amt);
+      wResult.appendChild(row);
+    });
+
+    wResult.appendChild(mkDiv('w-divider'));
+
+    const totalRow = mkDiv('w-total-row');
+    const tLabel = document.createElement('span');
+    tLabel.className = 'w-total-label';
+    tLabel.textContent = '合計';
+    const tAmt = document.createElement('span');
+    tAmt.className = 'w-total-amt';
+    tAmt.textContent = `₹${total.toLocaleString('ja-JP')}`;
+    totalRow.append(tLabel, tAmt);
+    wResult.appendChild(totalRow);
+  }
+
+  addBtn.addEventListener('click', () => {
+    if (people.length >= 10) return;
+    people.push({ name: '', shares: 1 });
+    renderPeople();
+    calcWarikan();
+    peopleList.querySelectorAll('.person-name-inp')[people.length - 1]?.focus();
+  });
+
+  totalInp.addEventListener('input', calcWarikan);
+  totalInp.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { totalInp.value = ''; calcWarikan(); }
+  });
+  totalClear.addEventListener('click', () => { totalInp.value = ''; calcWarikan(); totalInp.focus(); });
+
+  renderPeople();
 
   window.addEventListener('load', () => fromInput.focus());
 })();
